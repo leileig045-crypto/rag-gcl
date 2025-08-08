@@ -15,14 +15,15 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "file_upload")
 public class FileUpload {
-    /**
-     * 文件的唯一标识符
-     * 使用文件的MD5值来唯一确定一个文件
-     */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 自增主键
 
+    /**
+     * 文件的唯一标识符
+     * 使用文件的MD5值来唯一确定一个文件
+     */
     @Column(name = "file_md5", length = 32, nullable = false)
     private String fileMd5;
 

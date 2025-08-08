@@ -158,77 +158,40 @@ public class FileTypeValidationService {
         }
 
         // 根据文件扩展名返回文件类型
-        switch (extension.toLowerCase()) {
-            case "pdf":
-                return "PDF文档";
-            case "doc":
-            case "docx":
-                return "Word文档";
-            case "xls":
-            case "xlsx":
-                return "Excel表格";
-            case "ppt":
-            case "pptx":
-                return "PowerPoint演示文稿";
-            case "txt":
-                return "文本文件";
-            case "rtf":
-                return "富文本文档";
-            case "md":
-                return "Markdown文档";
-            case "odt":
-                return "OpenDocument文本";
-            case "ods":
-                return "OpenDocument表格";
-            case "odp":
-                return "OpenDocument演示文稿";
-            case "html":
-            case "htm":
-                return "HTML文档";
-            case "xml":
-                return "XML文档";
-            case "json":
-                return "JSON文件";
-            case "csv":
-                return "CSV文件";
-            case "epub":
-                return "EPUB电子书";
-            case "pages":
-                return "Apple Pages文档";
-            case "numbers":
-                return "Apple Numbers表格";
-            case "keynote":
-                return "Apple Keynote演示文稿";
-            case "jpg":
-            case "jpeg":
-                return "JPEG图片";
-            case "png":
-                return "PNG图片";
-            case "gif":
-                return "GIF图片";
-            case "bmp":
-                return "BMP图片";
-            case "svg":
-                return "SVG图片";
-            case "mp4":
-                return "MP4视频";
-            case "avi":
-                return "AVI视频";
-            case "mov":
-                return "MOV视频";
-            case "mp3":
-                return "MP3音频";
-            case "wav":
-                return "WAV音频";
-            case "zip":
-                return "ZIP压缩包";
-            case "rar":
-                return "RAR压缩包";
-            case "7z":
-                return "7Z压缩包";
-            default:
-                return extension.toUpperCase() + "文件";
-        }
+        return switch (extension.toLowerCase()) {
+            case "pdf" -> "PDF文档";
+            case "doc", "docx" -> "Word文档";
+            case "xls", "xlsx" -> "Excel表格";
+            case "ppt", "pptx" -> "PowerPoint演示文稿";
+            case "txt" -> "文本文件";
+            case "rtf" -> "富文本文档";
+            case "md" -> "Markdown文档";
+            case "odt" -> "OpenDocument文本";
+            case "ods" -> "OpenDocument表格";
+            case "odp" -> "OpenDocument演示文稿";
+            case "html", "htm" -> "HTML文档";
+            case "xml" -> "XML文档";
+            case "json" -> "JSON文件";
+            case "csv" -> "CSV文件";
+            case "epub" -> "EPUB电子书";
+            case "pages" -> "Apple Pages文档";
+            case "numbers" -> "Apple Numbers表格";
+            case "keynote" -> "Apple Keynote演示文稿";
+            case "jpg", "jpeg" -> "JPEG图片";
+            case "png" -> "PNG图片";
+            case "gif" -> "GIF图片";
+            case "bmp" -> "BMP图片";
+            case "svg" -> "SVG图片";
+            case "mp4" -> "MP4视频";
+            case "avi" -> "AVI视频";
+            case "mov" -> "MOV视频";
+            case "mp3" -> "MP3音频";
+            case "wav" -> "WAV音频";
+            case "zip" -> "ZIP压缩包";
+            case "rar" -> "RAR压缩包";
+            case "7z" -> "7Z压缩包";
+            default -> extension.toUpperCase() + "文件";
+        };
     }
 
     /**
