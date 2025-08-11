@@ -104,6 +104,11 @@ async function getList() {
   // 等待获取最新数据
   await getData();
 
+  if (data.value.length === 0) {
+    tasks.value = [];
+    return;
+  }
+
   // 遍历获取到的数据，以处理每个项目
   data.value.forEach(item => {
     // 检查项目状态是否为已完成

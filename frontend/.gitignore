@@ -33,5 +33,5 @@ package-lock.json
 yarn.lock
 
 .VSCodeCounter
-src/typings/components.d.ts
-src/typings/auto-imports.d.ts
+components.d.ts
+auto-imports.d.ts

@@ -11,6 +11,7 @@ defineOptions({
 });
 
 const authStore = useAuthStore();
+const knowledgeBaseStore = useKnowledgeBaseStore();
 const { routerPushByKey, toLogin } = useRouterPush();
 const { SvgIconVNode } = useSvgIcon();
 
@@ -51,6 +52,7 @@ function logout() {
     negativeText: $t('common.cancel'),
     onPositiveClick: () => {
       authStore.resetStore();
+      knowledgeBaseStore.$reset();
     }
   });
 }
