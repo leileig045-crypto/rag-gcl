@@ -57,12 +57,12 @@ public class DocumentService {
      * @param fileMd5 文件MD5
      */
     @Transactional
-    public void deleteDocument(String fileMd5) {
+    public void deleteDocument(String fileMd5, String userId) {
         logger.info("开始删除文档: {}", fileMd5);
         
         try {
             // 获取文件信息以获取文件名
-            FileUpload fileUpload = fileUploadRepository.findByFileMd5(fileMd5)
+            FileUpload fileUpload = fileUploadRepository.findByFileMd5AndUserId(fileMd5, userId)
                     .orElseThrow(() -> new RuntimeException("文件不存在"));
             
             // 1. 删除Elasticsearch中的数据

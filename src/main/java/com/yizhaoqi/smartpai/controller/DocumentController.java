@@ -83,7 +83,7 @@ public class DocumentController {
             }
             
             // 执行删除操作
-            documentService.deleteDocument(fileMd5);
+            documentService.deleteDocument(fileMd5, userId);
             
             LogUtils.logFileOperation(userId, "DELETE", file.getFileName(), fileMd5, "SUCCESS");
             monitor.end("文档删除成功");

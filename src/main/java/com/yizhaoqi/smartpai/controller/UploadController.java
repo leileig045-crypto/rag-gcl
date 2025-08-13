@@ -127,8 +127,8 @@ public class UploadController {
         
             uploadService.uploadChunk(fileMd5, chunkIndex, totalSize, fileName, file, orgTag, isPublic, userId);
             
-            List<Integer> uploadedChunks = uploadService.getUploadedChunks(fileMd5);
-            int actualTotalChunks = uploadService.getTotalChunks(fileMd5);
+            List<Integer> uploadedChunks = uploadService.getUploadedChunks(fileMd5, userId);
+            int actualTotalChunks = uploadService.getTotalChunks(fileMd5, userId);
             double progress = calculateProgress(uploadedChunks, actualTotalChunks);
             
             LogUtils.logBusiness("UPLOAD_CHUNK", userId, "分片上传成功: fileMd5=%s, fileName=%s, fileType=%s, chunkIndex=%d, 进度=%.2f%%", 
@@ -165,7 +165,7 @@ public class UploadController {
      * @return 返回包含已上传分片和上传进度的响应
      */
     @GetMapping("/status")
-    public ResponseEntity<Map<String, Object>> getUploadStatus(@RequestParam("file_md5") String fileMd5) {
+    public ResponseEntity<Map<String, Object>> getUploadStatus(@RequestParam("file_md5") String fileMd5, @RequestAttribute("userId") String userId) {
         LogUtils.PerformanceMonitor monitor = LogUtils.startPerformanceMonitor("GET_UPLOAD_STATUS");
         try {
             // 获取文件信息
@@ -184,8 +184,8 @@ public class UploadController {
             
             LogUtils.logBusiness("GET_UPLOAD_STATUS", "system", "获取文件上传状态: fileMd5=%s, fileName=%s, fileType=%s", fileMd5, fileName, fileType);
             
-            List<Integer> uploadedChunks = uploadService.getUploadedChunks(fileMd5);
-            int totalChunks = uploadService.getTotalChunks(fileMd5);
+            List<Integer> uploadedChunks = uploadService.getUploadedChunks(fileMd5, userId);
+            int totalChunks = uploadService.getTotalChunks(fileMd5, userId);
             double progress = calculateProgress(uploadedChunks, totalChunks);
             
             LogUtils.logBusiness("GET_UPLOAD_STATUS", "system", "文件上传状态: fileMd5=%s, fileName=%s, fileType=%s, 已上传=%d/%d, 进度=%.2f%%", 
@@ -258,8 +258,8 @@ public class UploadController {
             LogUtils.logBusiness("MERGE_FILE", userId, "权限验证通过，开始合并文件: fileMd5=%s, fileName=%s, fileType=%s", request.fileMd5(), request.fileName(), fileType);
             
             // 检查分片是否全部上传完成
-            List<Integer> uploadedChunks = uploadService.getUploadedChunks(request.fileMd5());
-            int totalChunks = uploadService.getTotalChunks(request.fileMd5());
+            List<Integer> uploadedChunks = uploadService.getUploadedChunks(request.fileMd5(), userId);
+            int totalChunks = uploadService.getTotalChunks(request.fileMd5(), userId);
             LogUtils.logBusiness("MERGE_FILE", userId, "分片上传状态: fileMd5=%s, fileName=%s, 已上传=%d/%d", 
                     request.fileMd5(), request.fileName(), uploadedChunks.size(), totalChunks);
             
@@ -274,7 +274,7 @@ public class UploadController {
 
             // 合并文件
             LogUtils.logBusiness("MERGE_FILE", userId, "开始合并文件分片: fileMd5=%s, fileName=%s, fileType=%s, 分片数量=%d", request.fileMd5(), request.fileName(), fileType, totalChunks);
-            String objectUrl = uploadService.mergeChunks(request.fileMd5(), request.fileName());
+            String objectUrl = uploadService.mergeChunks(request.fileMd5(), request.fileName(), userId);
             LogUtils.logFileOperation(userId, "MERGE", request.fileName(), request.fileMd5(), "SUCCESS");
 
             // 发送任务到 Kafka，包含完整的权限信息

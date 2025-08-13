@@ -96,7 +96,7 @@ public class UploadService {
             }
 
             // 检查分片是否已经上传
-            boolean chunkUploaded = isChunkUploaded(fileMd5, chunkIndex);
+            boolean chunkUploaded = isChunkUploaded(fileMd5, chunkIndex, userId);
             logger.debug("检查分片是否已上传 => fileMd5: {}, fileName: {}, chunkIndex: {}, isUploaded: {}", 
                       fileMd5, fileName, chunkIndex, chunkUploaded);
                       
@@ -199,7 +199,7 @@ public class UploadService {
                 // 标记分片已上传
                 try {
                     logger.debug("标记分片为已上传 => fileMd5: {}, fileName: {}, chunkIndex: {}", fileMd5, fileName, chunkIndex);
-                    markChunkUploaded(fileMd5, chunkIndex);
+                    markChunkUploaded(fileMd5, chunkIndex, userId);
                     logger.debug("分片标记完成 => fileMd5: {}, fileName: {}, chunkIndex: {}", fileMd5, fileName, chunkIndex);
                 } catch (Exception e) {
                     logger.error("标记分片已上传失败 => fileMd5: {}, fileName: {}, chunkIndex: {}, 错误: {}", 
@@ -333,23 +333,24 @@ public class UploadService {
      *
      * @param fileMd5 文件的 MD5 值
      * @param chunkIndex 分片索引
+     * @param userId 用户ID
      * @return 分片是否已上传
      */
-    public boolean isChunkUploaded(String fileMd5, int chunkIndex) {
-        logger.debug("检查分片是否已上传 => fileMd5: {}, chunkIndex: {}", fileMd5, chunkIndex);
+    public boolean isChunkUploaded(String fileMd5, int chunkIndex, String userId) {
+        logger.debug("检查分片是否已上传 => fileMd5: {}, chunkIndex: {}, userId: {}", fileMd5, chunkIndex, userId);
         try {
             if (chunkIndex < 0) {
                 logger.error("无效的分片索引 => fileMd5: {}, chunkIndex: {}", fileMd5, chunkIndex);
                 throw new IllegalArgumentException("chunkIndex must be non-negative");
             }
-            String redisKey = "upload:" + fileMd5;
+            String redisKey = "upload:" + userId + ":" + fileMd5;
             boolean isUploaded = redisTemplate.opsForValue().getBit(redisKey, chunkIndex);
-            logger.debug("分片上传状态 => fileMd5: {}, chunkIndex: {}, isUploaded: {}", 
-                      fileMd5, chunkIndex, isUploaded);
+            logger.debug("分片上传状态 => fileMd5: {}, chunkIndex: {}, userId: {}, isUploaded: {}", 
+                      fileMd5, chunkIndex, userId, isUploaded);
             return isUploaded;
         } catch (Exception e) {
-            logger.error("检查分片上传状态失败 => fileMd5: {}, chunkIndex: {}, 错误: {}", 
-                      fileMd5, chunkIndex, e.getMessage(), e);
+            logger.error("检查分片上传状态失败 => fileMd5: {}, chunkIndex: {}, userId: {}, 错误: {}", 
+                      fileMd5, chunkIndex, userId, e.getMessage(), e);
             return false; // 或者根据业务需求返回其他值
         }
     }
@@ -359,20 +360,21 @@ public class UploadService {
      *
      * @param fileMd5 文件的 MD5 值
      * @param chunkIndex 分片索引
+     * @param userId 用户ID
      */
-    public void markChunkUploaded(String fileMd5, int chunkIndex) {
-        logger.debug("标记分片为已上传 => fileMd5: {}, chunkIndex: {}", fileMd5, chunkIndex);
+    public void markChunkUploaded(String fileMd5, int chunkIndex, String userId) {
+        logger.debug("标记分片为已上传 => fileMd5: {}, chunkIndex: {}, userId: {}", fileMd5, chunkIndex, userId);
         try {
             if (chunkIndex < 0) {
                 logger.error("无效的分片索引 => fileMd5: {}, chunkIndex: {}", fileMd5, chunkIndex);
                 throw new IllegalArgumentException("chunkIndex must be non-negative");
             }
-            String redisKey = "upload:" + fileMd5;
+            String redisKey = "upload:" + userId + ":" + fileMd5;
             redisTemplate.opsForValue().setBit(redisKey, chunkIndex, true);
-            logger.debug("分片已标记为已上传 => fileMd5: {}, chunkIndex: {}", fileMd5, chunkIndex);
+            logger.debug("分片已标记为已上传 => fileMd5: {}, chunkIndex: {}, userId: {}", fileMd5, chunkIndex, userId);
         } catch (Exception e) {
-            logger.error("标记分片为已上传失败 => fileMd5: {}, chunkIndex: {}, 错误: {}", 
-                      fileMd5, chunkIndex, e.getMessage(), e);
+            logger.error("标记分片为已上传失败 => fileMd5: {}, chunkIndex: {}, userId: {}, 错误: {}", 
+                      fileMd5, chunkIndex, userId, e.getMessage(), e);
             throw new RuntimeException("Failed to mark chunk as uploaded", e);
         }
     }
@@ -381,15 +383,16 @@ public class UploadService {
      * 删除文件所有分片上传标记
      *
      * @param fileMd5 文件的 MD5 值
+     * @param userId 用户ID
      */
-    public void deleteFileMark(String fileMd5) {
-        logger.debug("删除文件所有分片上传标记 => fileMd5: {}", fileMd5);
+    public void deleteFileMark(String fileMd5, String userId) {
+        logger.debug("删除文件所有分片上传标记 => fileMd5: {}, userId: {}", fileMd5, userId);
         try {
-            String redisKey = "upload:" + fileMd5;
+            String redisKey = "upload:" + userId + ":" + fileMd5;
             redisTemplate.delete(redisKey);
-            logger.info("文件分片上传标记已删除 => fileMd5: {}", fileMd5);
+            logger.info("文件分片上传标记已删除 => fileMd5: {}, userId: {}", fileMd5, userId);
         } catch (Exception e) {
-            logger.error("删除文件分片上传标记失败 => fileMd5: {}, 错误: {}", fileMd5, e.getMessage(), e);
+            logger.error("删除文件分片上传标记失败 => fileMd5: {}, userId: {}, 错误: {}", fileMd5, userId, e.getMessage(), e);
             throw new RuntimeException("Failed to delete file mark", e);
         }
     }
@@ -399,28 +402,29 @@ public class UploadService {
      * 获取已上传的分片列表
      *
      * @param fileMd5 文件的 MD5 值
+     * @param userId 用户ID
      * @return 包含已上传分片索引的列表
      */
-    public List<Integer> getUploadedChunks(String fileMd5) {
-        logger.info("获取已上传分片列表 => fileMd5: {}", fileMd5);
+    public List<Integer> getUploadedChunks(String fileMd5, String userId) {
+        logger.info("获取已上传分片列表 => fileMd5: {}, userId: {}", fileMd5, userId);
         List<Integer> uploadedChunks = new ArrayList<>();
         try {
-            int totalChunks = getTotalChunks(fileMd5);
-            logger.debug("文件总分片数 => fileMd5: {}, totalChunks: {}", fileMd5, totalChunks);
+            int totalChunks = getTotalChunks(fileMd5, userId);
+            logger.debug("文件总分片数 => fileMd5: {}, userId: {}, totalChunks: {}", fileMd5, userId, totalChunks);
             
             if (totalChunks == 0) {
-                logger.warn("文件总分片数为0 => fileMd5: {}", fileMd5);
+                logger.warn("文件总分片数为0 => fileMd5: {}, userId: {}", fileMd5, userId);
                 return uploadedChunks;
             }
             
             // 优化：一次性获取所有分片状态
-            String redisKey = "upload:" + fileMd5;
+            String redisKey = "upload:" + userId + ":" + fileMd5;
             byte[] bitmapData = redisTemplate.execute((RedisCallback<byte[]>) connection -> {
                 return connection.get(redisKey.getBytes());
             });
             
             if (bitmapData == null) {
-                logger.info("Redis中无分片状态记录 => fileMd5: {}", fileMd5);
+                logger.info("Redis中无分片状态记录 => fileMd5: {}, userId: {}", fileMd5, userId);
                 return uploadedChunks;
             }
             
@@ -431,11 +435,11 @@ public class UploadService {
                 }
             }
             
-            logger.info("获取到已上传分片列表 => fileMd5: {}, 已上传数量: {}, 总分片数: {}, 优化方式: 一次性获取", 
-                      fileMd5, uploadedChunks.size(), totalChunks);
+            logger.info("获取到已上传分片列表 => fileMd5: {}, userId: {}, 已上传数量: {}, 总分片数: {}, 优化方式: 一次性获取", 
+                      fileMd5, userId, uploadedChunks.size(), totalChunks);
             return uploadedChunks;
         } catch (Exception e) {
-            logger.error("获取已上传分片列表失败 => fileMd5: {}, 错误: {}", fileMd5, e.getMessage(), e);
+            logger.error("获取已上传分片列表失败 => fileMd5: {}, userId: {}, 错误: {}", fileMd5, userId, e.getMessage(), e);
             throw new RuntimeException("Failed to get uploaded chunks", e);
         }
     }
@@ -467,15 +471,16 @@ public class UploadService {
      * 获取文件的总分片数
      *
      * @param fileMd5 文件的 MD5 值
+     * @param userId 用户ID
      * @return 文件的总分片数
      */
-    public int getTotalChunks(String fileMd5) {
-        logger.info("计算文件总分片数 => fileMd5: {}", fileMd5);
+    public int getTotalChunks(String fileMd5, String userId) {
+        logger.info("计算文件总分片数 => fileMd5: {}, userId: {}", fileMd5, userId);
         try {
-            Optional<FileUpload> fileUpload = fileUploadRepository.findByFileMd5(fileMd5);
+            Optional<FileUpload> fileUpload = fileUploadRepository.findByFileMd5AndUserId(fileMd5, userId);
             
             if (fileUpload.isEmpty()) {
-                logger.warn("文件记录不存在，无法计算分片数 => fileMd5: {}", fileMd5);
+                logger.warn("文件记录不存在，无法计算分片数 => fileMd5: {}, userId: {}", fileMd5, userId);
                 return 0;
             }
             
@@ -484,11 +489,11 @@ public class UploadService {
             int chunkSize = 5 * 1024 * 1024;
             int totalChunks = (int) Math.ceil((double) totalSize / chunkSize);
             
-            logger.info("文件总分片数计算结果 => fileMd5: {}, totalSize: {}, chunkSize: {}, totalChunks: {}", 
-                      fileMd5, totalSize, chunkSize, totalChunks);
+            logger.info("文件总分片数计算结果 => fileMd5: {}, userId: {}, totalSize: {}, chunkSize: {}, totalChunks: {}", 
+                      fileMd5, userId, totalSize, chunkSize, totalChunks);
             return totalChunks;
         } catch (Exception e) {
-            logger.error("计算文件总分片数失败 => fileMd5: {}, 错误: {}", fileMd5, e.getMessage(), e);
+            logger.error("计算文件总分片数失败 => fileMd5: {}, userId: {}, 错误: {}", fileMd5, userId, e.getMessage(), e);
             throw new RuntimeException("Failed to calculate total chunks", e);
         }
     }
@@ -525,11 +530,12 @@ public class UploadService {
      *
      * @param fileMd5 文件的 MD5 值
      * @param fileName 文件名
+     * @param userId 用户ID
      * @return 合成文件的访问 URL
      */
-    public String mergeChunks(String fileMd5, String fileName) {
+    public String mergeChunks(String fileMd5, String fileName, String userId) {
         String fileType = getFileType(fileName);
-        logger.info("开始合并文件分片 => fileMd5: {}, fileName: {}, fileType: {}", fileMd5, fileName, fileType);
+        logger.info("开始合并文件分片 => fileMd5: {}, fileName: {}, fileType: {}, userId: {}", fileMd5, fileName, fileType, userId);
         try {
             // 查询所有分片信息
             logger.debug("查询分片信息 => fileMd5: {}, fileName: {}", fileMd5, fileName);
@@ -537,7 +543,7 @@ public class UploadService {
             logger.info("查询到分片信息 => fileMd5: {}, fileName: {}, fileType: {}, 分片数量: {}", fileMd5, fileName, fileType, chunks.size());
             
             // 检查分片数量是否与预期一致
-            int expectedChunks = getTotalChunks(fileMd5);
+            int expectedChunks = getTotalChunks(fileMd5, userId);
             if (chunks.size() != expectedChunks) {
                 logger.error("分片数量不匹配 => fileMd5: {}, fileName: {}, fileType: {}, 期望: {}, 实际: {}", 
                           fileMd5, fileName, fileType, expectedChunks, chunks.size());
@@ -619,13 +625,13 @@ public class UploadService {
                 logger.info("分片文件清理完成 => fileMd5: {}, fileName: {}, fileType: {}", fileMd5, fileName, fileType);
 
                 // 删除 Redis 中的分片状态记录
-                logger.info("删除Redis中的分片状态记录 => fileMd5: {}, fileName: {}", fileMd5, fileName);
-                deleteFileMark(fileMd5);
-                logger.info("分片状态记录已删除 => fileMd5: {}, fileName: {}", fileMd5, fileName);
+                logger.info("删除Redis中的分片状态记录 => fileMd5: {}, fileName: {}, userId: {}", fileMd5, fileName, userId);
+                deleteFileMark(fileMd5, userId);
+                logger.info("分片状态记录已删除 => fileMd5: {}, fileName: {}, userId: {}", fileMd5, fileName, userId);
 
                 // 更新文件状态
-                logger.info("更新文件状态为已完成 => fileMd5: {}, fileName: {}, fileType: {}", fileMd5, fileName, fileType);
-                FileUpload fileUpload = fileUploadRepository.findByFileMd5(fileMd5)
+                logger.info("更新文件状态为已完成 => fileMd5: {}, fileName: {}, fileType: {}, userId: {}", fileMd5, fileName, fileType, userId);
+                FileUpload fileUpload = fileUploadRepository.findByFileMd5AndUserId(fileMd5, userId)
                         .orElseThrow(() -> {
                             logger.error("更新文件状态失败，文件记录不存在 => fileMd5: {}, fileName: {}", fileMd5, fileName);
                             return new RuntimeException("文件记录不存在: " + fileMd5);

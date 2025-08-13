@@ -102,4 +102,5 @@ embedding:
     url: https://dashscope.aliyuncs.com/compatible-mode/v1
     key: sk-f740bdc3235443f48a328bfccf135adf  # 填入通义千问API key
     model: text-embedding-v4
+    batch-size: 10  # 单次请求最大行数（DashScope限制为10）
     dimension: 2048  # 指定向量维度
