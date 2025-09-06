@@ -63,8 +63,13 @@ const accounts = computed<Account[]>(() => [
   }
 ]);
 
-async function handleAccountLogin(account: Account) {
-  await authStore.login(account.userName, account.password);
+function handleAccountLogin(account: Account) {
+  // 将账号信息填充到表单中，然后触发正常的验证流程
+  model.userName = account.userName;
+  model.password = account.password;
+  
+  // 调用正常的表单提交流程，确保验证
+  handleSubmit();
 }
 </script>
 

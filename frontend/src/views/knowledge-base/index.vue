@@ -1,14 +1,19 @@
 <script setup lang="tsx">
 import type { UploadFileInfo } from 'naive-ui';
-import { NButton, NEllipsis, NPopconfirm, NProgress, NTag, NUpload } from 'naive-ui';
+import { NButton, NEllipsis, NModal, NPopconfirm, NProgress, NTag, NUpload } from 'naive-ui';
 import { uploadAccept } from '@/constants/common';
 import { fakePaginationRequest } from '@/service/request';
 import { UploadStatus } from '@/enum';
 import SvgIcon from '@/components/custom/svg-icon.vue';
+import FilePreview from '@/components/custom/file-preview.vue';
 import UploadDialog from './modules/upload-dialog.vue';
 import SearchDialog from './modules/search-dialog.vue';
 
 const appStore = useAppStore();
+
+// 文件预览相关状态
+const previewVisible = ref(false);
+const previewFileName = ref('');
 
 function apiFn() {
   return fakePaginationRequest<Api.KnowledgeBase.List>({ url: '/documents/uploads' });
@@ -23,6 +28,18 @@ function renderIcon(fileName: string) {
   return null;
 }
 
+// 处理文件预览
+function handleFilePreview(fileName: string) {
+  previewFileName.value = fileName;
+  previewVisible.value = true;
+}
+
+// 关闭文件预览
+function closeFilePreview() {
+  previewVisible.value = false;
+  previewFileName.value = '';
+}
+
 const { columns, columnChecks, data, getData, loading } = useTable({
   apiFn,
   immediate: false,
@@ -35,7 +52,12 @@ const { columns, columnChecks, data, getData, loading } = useTable({
         <div class="flex items-center">
           {renderIcon(row.fileName)}
           <NEllipsis lineClamp={2} tooltip>
-            {row.fileName}
+            <span
+              class="cursor-pointer hover:text-primary transition-colors"
+              onClick={() => handleFilePreview(row.fileName)}
+            >
+              {row.fileName}
+            </span>
           </NEllipsis>
         </div>
       )
@@ -62,7 +84,7 @@ const { columns, columnChecks, data, getData, loading } = useTable({
       key: 'isPublic',
       title: '是否公开',
       width: 100,
-      render: row => (row.isPublic ? <NTag type="success">公开</NTag> : <NTag type="warning">私有</NTag>)
+      render: row => (row.public || row.isPublic ? <NTag type="success">公开</NTag> : <NTag type="warning">私有</NTag>)
     },
     {
       key: 'createdAt',
@@ -73,10 +95,18 @@ const { columns, columnChecks, data, getData, loading } = useTable({
     {
       key: 'operate',
       title: '操作',
-      width: 140,
+      width: 180,
       render: row => (
         <div class="flex gap-4">
           {renderResumeUploadButton(row)}
+          <NButton
+            type="primary"
+            ghost
+            size="small"
+            onClick={() => handleFilePreview(row.fileName)}
+          >
+            预览
+          </NButton>
           <NPopconfirm onPositiveClick={() => handleDelete(row.fileMd5)}>
             {{
               default: () => '确认删除当前文件吗？',
@@ -265,10 +295,23 @@ async function onBeforeUpload(
     </NCard>
     <UploadDialog v-model:visible="uploadVisible" />
     <SearchDialog v-model:visible="searchVisible" />
+    
+    <!-- 文件预览弹窗 -->
+    <NModal v-model:show="previewVisible" preset="card" title="文件预览" style="width: 80%; max-width: 1000px;">
+      <FilePreview
+        :file-name="previewFileName"
+        :visible="previewVisible"
+        @close="closeFilePreview"
+      />
+    </NModal>
   </div>
 </template>
 
 <style scoped lang="scss">
+.file-list-container {
+  transition: width 0.3s ease;
+}
+
 :deep() {
   .n-progress-icon.n-progress-icon--as-text {
     white-space: nowrap;

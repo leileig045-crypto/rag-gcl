@@ -142,6 +142,7 @@ declare namespace Api {
       fileName: string;
       orgTag: string | null;
       orgTagName?: string | null;
+      public: boolean;
       isPublic: boolean;
       uploadedChunks: number[];
       progress: number;

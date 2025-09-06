@@ -5,6 +5,7 @@ import com.yizhaoqi.smartpai.model.User;
 import com.yizhaoqi.smartpai.repository.DocumentVectorRepository;
 import com.yizhaoqi.smartpai.repository.FileUploadRepository;
 import com.yizhaoqi.smartpai.repository.UserRepository;
+import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.RemoveObjectArgs;
@@ -15,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -122,7 +126,7 @@ public class DocumentService {
         
         try {
             // 获取用户有效的组织标签（包含层级关系）
-            User user = userRepository.findById(Long.parseLong(userId))
+            User user = userRepository.findByUsername(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在: " + userId));
             
             List<String> userEffectiveTags = orgTagCacheService.getUserEffectiveOrgTags(user.getUsername());
@@ -200,6 +204,120 @@ public class DocumentService {
         } catch (Exception e) {
             logger.error("生成文件下载链接失败: fileMd5={}", fileMd5, e);
             return null;
+        }
+    }
+    
+    /**
+     * 获取文件预览内容
+     * 
+     * @param fileMd5 文件MD5
+     * @param fileName 文件名
+     * @return 文件预览内容，对于文本文件返回前几KB内容，非文本文件返回文件信息
+     */
+    public String getFilePreviewContent(String fileMd5, String fileName) {
+        logger.info("获取文件预览内容: fileMd5={}, fileName={}", fileMd5, fileName);
+        
+        try {
+            // MinIO中的对象路径格式: merged/文件名
+            String objectName = "merged/" + fileName;
+            
+            // 判断文件类型
+            String fileExtension = getFileExtension(fileName).toLowerCase();
+            boolean isTextFile = isTextFile(fileExtension);
+            
+            if (isTextFile) {
+                // 对于文本文件，读取前10KB内容
+                try (InputStream inputStream = minioClient.getObject(
+                        GetObjectArgs.builder()
+                                .bucket("uploads")
+                                .object(objectName)
+                                .build())) {
+                    
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                    StringBuilder content = new StringBuilder();
+                    String line;
+                    int bytesRead = 0;
+                    int maxBytes = 10240; // 10KB
+                    
+                    while ((line = reader.readLine()) != null && bytesRead < maxBytes) {
+                        content.append(line).append("\n");
+                        bytesRead += line.getBytes("UTF-8").length + 1;
+                    }
+                    
+                    String result = content.toString();
+                    if (bytesRead >= maxBytes) {
+                        result += "\n... (内容已截断，仅显示前10KB)";
+                    }
+                    
+                    logger.info("成功获取文本文件预览内容: fileMd5={}, contentLength={}", fileMd5, result.length());
+                    return result;
+                }
+            } else {
+                // 对于非文本文件，返回文件信息
+                FileUpload fileUpload = fileUploadRepository.findByFileMd5(fileMd5)
+                        .orElseThrow(() -> new RuntimeException("文件不存在: " + fileMd5));
+                
+                String fileInfo = String.format(
+                    "文件名: %s\n" +
+                    "文件大小: %s\n" +
+                    "文件类型: %s\n" +
+                    "上传时间: %s\n\n" +
+                    "此文件类型不支持预览，请下载后查看。",
+                    fileName,
+                    formatFileSize(fileUpload.getTotalSize()),
+                    fileExtension.toUpperCase(),
+                    fileUpload.getCreatedAt()
+                );
+                
+                logger.info("返回非文本文件信息: fileMd5={}", fileMd5);
+                return fileInfo;
+            }
+            
+        } catch (Exception e) {
+            logger.error("获取文件预览内容失败: fileMd5={}, fileName={}", fileMd5, fileName, e);
+            return "预览失败: " + e.getMessage();
+        }
+    }
+    
+    /**
+     * 获取文件扩展名
+     */
+    private String getFileExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf('.');
+        if (lastDotIndex == -1) {
+            return "";
+        }
+        return fileName.substring(lastDotIndex + 1);
+    }
+    
+    /**
+     * 判断是否为文本文件
+     */
+    private boolean isTextFile(String extension) {
+        String[] textExtensions = {
+            "txt", "md", "doc", "docx", "pdf", "html", "htm", "xml", "json", 
+            "csv", "log", "java", "js", "ts", "py", "cpp", "c", "h", "css", 
+            "scss", "less", "sql", "yml", "yaml", "properties", "conf", "config"
+        };
+        
+        return Arrays.stream(textExtensions)
+                .anyMatch(ext -> ext.equalsIgnoreCase(extension));
+    }
+    
+    /**
+     * 格式化文件大小
+     */
+    private String formatFileSize(Long size) {
+        if (size == null) return "未知";
+        
+        if (size < 1024) {
+            return size + " B";
+        } else if (size < 1024 * 1024) {
+            return String.format("%.1f KB", size / 1024.0);
+        } else if (size < 1024 * 1024 * 1024) {
+            return String.format("%.1f MB", size / (1024.0 * 1024.0));
+        } else {
+            return String.format("%.1f GB", size / (1024.0 * 1024.0 * 1024.0));
         }
     }
 } 
