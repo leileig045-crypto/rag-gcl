@@ -13,7 +13,7 @@ import java.util.Collections;
 
 // 提供混合检索接口
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/api/v1/search")
 public class SearchController {
 
     @Autowired
@@ -22,13 +22,13 @@ public class SearchController {
     /**
      * 混合检索接口
      * 
-     * URL: /api/search/hybrid
+     * URL: /api/v1/search/hybrid
      * Method: GET
      * Parameters:
      *   - query: 搜索查询字符串（必需）
      *   - topK: 返回结果数量（可选，默认10）
      * 
-     * 示例: /api/search/hybrid?query=人工智能的发展&topK=10
+     * 示例: /api/v1/search/hybrid?query=人工智能的发展&topK=10
      * 
      * Response:
      * [

@@ -201,3 +201,16 @@ public class FileUpload {
     // 其他字段和方法
 }
 ```
+
+## 前端启动
+
+```bash
+# 进入前端项目目录
+cd frontend
+
+# 安装依赖
+pnpm install
+
+# 启动项目
+pnpm run dev
+```

@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Component
 @RestController
-@RequestMapping("/api/chat")
+@RequestMapping("/api/v1/chat")
 public class ChatController extends TextWebSocketHandler {
 
     private final ChatHandler chatHandler;

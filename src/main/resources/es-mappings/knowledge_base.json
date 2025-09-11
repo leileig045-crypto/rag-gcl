@@ -9,7 +9,8 @@
       },
       "textContent": {
         "type": "text",
-        "analyzer": "standard"
+        "analyzer": "ik_max_word",
+        "search_analyzer": "ik_smart"
       },
       "vector": {
         "type": "dense_vector",
