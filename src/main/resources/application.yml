@@ -99,9 +99,17 @@ log4j:
 
 deepseek:
   api:
-    url: https://api.deepseek.com/v1  # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
-    model: deepseek-chat  # 本地: deepseek-r1:7b, 官方: deepseek-chat
-    key: sk-2f99e51f7f794db9aaac9cd007c9aa97  # DeepSeek API Key 如果是本地就为空
+#    url: https://api.deepseek.com/v1  # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
+#    model: deepseek-chat  # 本地: deepseek-r1:7b, 官方: deepseek-chat
+#    key: sk-2f99e51f7f794db9aaac9cd007c9aa97  # DeepSeek API Key 如果是本地就为空
+
+    url: http://localhost:11434/v1  # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
+    model: qwen3:8b  # 本地: deepseek-r1:7b, 官方: deepseek-chat
+    key:   # DeepSeek API Key 如果是本地就为空
+
+#    url: https://open.bigmodel.cn/api/paas/v4/  # 本地是 http://localhost:11434/v1 官方：https://api.deepseek.com/v1
+#    model: glm-4.5  # 本地: deepseek-r1:7b, 官方: deepseek-chat
+#    key: f311b271b3ee48e8afd760c63a04c9f5.S2D4nBGmTmWroB92 # DeepSeek API Key 如果是本地就为空
 
 embedding:
   api:
