@@ -16,6 +16,11 @@ export function fetchLogin(username: string, password: string) {
     }
   });
 }
+
+export function fetchLogout() {
+  return request({ url: '/users/logout', method: 'post' });
+}
+
 export function fetchRegister(username: string, password: string) {
   return request({
     url: '/users/register',

@@ -11,7 +11,6 @@ defineOptions({
 });
 
 const authStore = useAuthStore();
-const knowledgeBaseStore = useKnowledgeBaseStore();
 const { routerPushByKey, toLogin } = useRouterPush();
 const { SvgIconVNode } = useSvgIcon();
 
@@ -50,9 +49,8 @@ function logout() {
     content: $t('common.logoutConfirm'),
     positiveText: $t('common.confirm'),
     negativeText: $t('common.cancel'),
-    onPositiveClick: () => {
-      authStore.resetStore();
-      knowledgeBaseStore.$reset();
+    onPositiveClick: async () => {
+      await authStore.logout();
     }
   });
 }
