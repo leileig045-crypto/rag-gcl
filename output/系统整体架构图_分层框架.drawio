@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-16T00:00:00.000Z" agent="Claude" version="24.0.0">
+  <diagram id="layered-architecture" name="PaiSmart RAG系统分层架构图">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ============================================================ -->
+        <!--          LAYER 1: 接入层 (Access Layer)                       -->
+        <!-- ============================================================ -->
+        <mxCell id="layer1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#E0E0E0;strokeWidth=1;dashed=0;container=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="30" width="1480" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer1_label" value="&lt;b&gt;接入层&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#333333;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="30" width="80" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Vue 3 Web应用 -->
+        <mxCell id="a_vue" value="&lt;b&gt;Vue 3 Web应用&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;SoybeanJS Admin + Naive UI&lt;br&gt;Pinia 状态管理 + TypeScript" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4CAF50;strokeWidth=2;fontColor=#1B5E20;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer1">
+          <mxGeometry x="30" y="40" width="440" height="85" as="geometry"/>
+        </mxCell>
+
+        <!-- 移动端 H5页面 -->
+        <mxCell id="a_mobile" value="&lt;b&gt;移动端 H5页面&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;响应式布局&lt;br&gt;WebSocket 实时对话" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4CAF50;strokeWidth=2;fontColor=#1B5E20;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer1">
+          <mxGeometry x="520" y="40" width="440" height="85" as="geometry"/>
+        </mxCell>
+
+        <!-- WebSocket 即时通信 -->
+        <mxCell id="a_ws" value="&lt;b&gt;WebSocket 即时通信&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;流式SSE响应推送&lt;br&gt;Markdown实时渲染" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4CAF50;strokeWidth=2;fontColor=#1B5E20;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer1">
+          <mxGeometry x="1010" y="40" width="440" height="85" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow: L1 → L2 -->
+        <mxCell id="e_l1_l2" value="&lt;b&gt;HTTPS / WSS&lt;/b&gt;" style="html=1;rounded=1;strokeColor=#666666;strokeWidth=2;endArrow=block;endFill=1;fontSize=12;fontColor=#333333;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="layer1" target="layer2" parent="1">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset"/>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--          LAYER 2: 处理层 (Processing Layer)                   -->
+        <!-- ============================================================ -->
+        <mxCell id="layer2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#E0E0E0;strokeWidth=1;container=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="230" width="1480" height="310" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer2_label" value="&lt;b&gt;处理层&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#333333;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="230" width="80" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Row 1 -->
+        <!-- 文档处理服务 -->
+        <mxCell id="p_doc" value="&lt;b&gt;文档处理服务&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;UploadService&lt;br&gt;ParseService (Tika + HanLP)&lt;br&gt;VectorizationService&lt;br&gt;FileTypeValidationService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2196F3;strokeWidth=2;fontColor=#0D47A1;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer2">
+          <mxGeometry x="30" y="40" width="440" height="115" as="geometry"/>
+        </mxCell>
+
+        <!-- 检索服务 -->
+        <mxCell id="p_search" value="&lt;b&gt;检索服务&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;HybridSearchService&lt;br&gt;KNN向量 + BM25文本匹配&lt;br&gt;Rescore重排序 + 权限过滤" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2196F3;strokeWidth=2;fontColor=#0D47A1;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer2">
+          <mxGeometry x="520" y="40" width="440" height="115" as="geometry"/>
+        </mxCell>
+
+        <!-- 问答服务 -->
+        <mxCell id="p_chat" value="&lt;b&gt;问答服务&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;ChatHandler (RAG流程编排)&lt;br&gt;上下文构建 + Prompt组装&lt;br&gt;DeepSeek流式调用 + WS推送&lt;br&gt;会话历史管理(Redis)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2196F3;strokeWidth=2;fontColor=#0D47A1;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer2">
+          <mxGeometry x="1010" y="40" width="440" height="115" as="geometry"/>
+        </mxCell>
+
+        <!-- Row 2 -->
+        <!-- 权限控制服务 -->
+        <mxCell id="p_auth" value="&lt;b&gt;权限控制服务&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;JWT认证 (自动刷新/宽限期)&lt;br&gt;OrgTag组织权限过滤器&lt;br&gt;私人/组织/公开 三级控制" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2196F3;strokeWidth=2;fontColor=#0D47A1;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer2">
+          <mxGeometry x="30" y="180" width="440" height="105" as="geometry"/>
+        </mxCell>
+
+        <!-- 文件管理服务 -->
+        <mxCell id="p_file" value="&lt;b&gt;文件管理服务&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;DocumentService&lt;br&gt;文档CRUD / 权限过滤查询&lt;br&gt;MinIO存储 / 预签名下载" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2196F3;strokeWidth=2;fontColor=#0D47A1;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer2">
+          <mxGeometry x="520" y="180" width="440" height="105" as="geometry"/>
+        </mxCell>
+
+        <!-- 会话管理 -->
+        <mxCell id="p_session" value="&lt;b&gt;会话管理&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;ConversationService&lt;br&gt;Redis会话历史 (7天TTL)&lt;br&gt;OrgTagCacheService / TokenCacheService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2196F3;strokeWidth=2;fontColor=#0D47A1;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer2">
+          <mxGeometry x="1010" y="180" width="440" height="105" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow: L2 → L3 -->
+        <mxCell id="e_l2_l3" value="" style="html=1;rounded=1;strokeColor=#666666;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="layer2" target="layer3" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--       LAYER 3: 服务层 (External Services)                    -->
+        <!-- ============================================================ -->
+        <mxCell id="layer3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#E0E0E0;strokeWidth=1;container=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="590" width="1480" height="230" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer3_label" value="&lt;b&gt;服务层（外部服务）&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#333333;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="590" width="160" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Row 1 -->
+        <!-- DeepSeek API -->
+        <mxCell id="s_deepseek" value="&lt;b&gt;DeepSeek API&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;deepseek-chat 模型&lt;br&gt;SSE流式响应" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=2;fontColor=#E65100;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer3">
+          <mxGeometry x="30" y="40" width="440" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Embedding API -->
+        <mxCell id="s_embed" value="&lt;b&gt;Embedding API&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;text-embedding-v4 (DashScope)&lt;br&gt;2048维向量 / 批量=10" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=2;fontColor=#E65100;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer3">
+          <mxGeometry x="520" y="40" width="440" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Kafka 消息队列 -->
+        <mxCell id="s_kafka" value="&lt;b&gt;Kafka 消息队列&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;异步文档处理管道&lt;br&gt;事务性消息 / 死信队列" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00BCD4;strokeWidth=2;fontColor=#006064;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer3">
+          <mxGeometry x="1010" y="40" width="440" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Row 2 -->
+        <!-- MinIO 文件存储 -->
+        <mxCell id="s_minio" value="&lt;b&gt;MinIO 文件存储&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;S3兼容对象存储&lt;br&gt;分片上传 / 预签名URL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=2;fontColor=#E65100;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer3">
+          <mxGeometry x="30" y="130" width="440" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Redis 缓存 -->
+        <mxCell id="s_redis" value="&lt;b&gt;Redis 缓存&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;Token缓存 / 会话存储&lt;br&gt;上传进度 / 组织标签" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=2;fontColor=#E65100;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer3">
+          <mxGeometry x="520" y="130" width="440" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- MySQL 关系数据库 -->
+        <mxCell id="s_mysql" value="&lt;b&gt;MySQL 关系数据库&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;用户 / 文件 / 分块 / 组织标签&lt;br&gt;会话记录" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#FF9800;strokeWidth=2;fontColor=#E65100;fontSize=12;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer3">
+          <mxGeometry x="1010" y="130" width="440" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrow: L3 → L4 -->
+        <mxCell id="e_l3_l4" value="" style="html=1;rounded=1;strokeColor=#666666;strokeWidth=2;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="layer3" target="layer4" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--          LAYER 4: 数据层 (Data Layer)                        -->
+        <!-- ============================================================ -->
+        <mxCell id="layer4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#E0E0E0;strokeWidth=1;container=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="865" width="1480" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="layer4_label" value="&lt;b&gt;数据层&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontColor=#333333;fontSize=15;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="865" width="80" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Elasticsearch -->
+        <mxCell id="d_es" value="&lt;b&gt;Elasticsearch 知识库向量存储&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;knowledge_base 索引&lt;br&gt;dense_vector 2048维 (cosine)&lt;br&gt;ik_max_word / ik_smart 中文分词&lt;br&gt;KNN向量 + BM25全文检索" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9C27B0;strokeWidth=2;fontColor=#4A148C;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer4">
+          <mxGeometry x="30" y="35" width="440" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- Redis 会话存储 -->
+        <mxCell id="d_redis" value="&lt;b&gt;Redis 会话存储&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;对话历史 (7天TTL, 最近20条)&lt;br&gt;JWT令牌缓存 / 黑名单&lt;br&gt;上传进度 Bitmap / 组织标签层级缓存" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9C27B0;strokeWidth=2;fontColor=#4A148C;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer4">
+          <mxGeometry x="520" y="35" width="440" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- MySQL 元数据存储 -->
+        <mxCell id="d_mysql" value="&lt;b&gt;MySQL 元数据存储&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;user / file_upload / document_vector&lt;br&gt;conversation / organization_tag / chunk_info&lt;br&gt;JPA/Hibernate ORM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#9C27B0;strokeWidth=2;fontColor=#4A148C;fontSize=11;verticalAlign=middle;spacingTop=2;spacingBottom=2;" vertex="1" parent="layer4">
+          <mxGeometry x="1010" y="35" width="440" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--              INTER-LAYER DATA FLOW ARROWS                    -->
+        <!-- ============================================================ -->
+
+        <!-- 处理层 → DeepSeek API -->
+        <mxCell id="e_chat_deepseek" value="LLM流式调用" style="html=1;rounded=1;strokeColor=#FF9800;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#E65100;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p_chat" target="s_deepseek" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 检索服务 → Embedding API -->
+        <mxCell id="e_search_embed" value="查询向量化" style="html=1;rounded=1;strokeColor=#FF9800;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#E65100;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p_search" target="s_embed" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 文档处理 → Kafka -->
+        <mxCell id="e_doc_kafka" value="异步处理" style="html=1;rounded=1;strokeColor=#00BCD4;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#006064;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="p_doc" target="s_kafka" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 文档处理 → Embedding API -->
+        <mxCell id="e_doc_embed" value="批量向量化" style="html=1;rounded=1;strokeColor=#FF9800;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#E65100;dashed=1;exitX=0.7;exitY=1;exitDx=0;exitDy=0;entryX=0.7;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p_doc" target="s_embed" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 会话管理 → Redis -->
+        <mxCell id="e_session_redis" value="会话缓存" style="html=1;rounded=1;strokeColor=#FF9800;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#E65100;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p_session" target="s_redis" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 权限控制 → MySQL -->
+        <mxCell id="e_auth_mysql" value="用户验证" style="html=1;rounded=1;strokeColor=#FF9800;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#E65100;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p_auth" target="s_mysql" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 文件管理 → MinIO -->
+        <mxCell id="e_file_minio" value="文件读写" style="html=1;rounded=1;strokeColor=#FF9800;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#E65100;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="p_file" target="s_minio" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Embedding API → Elasticsearch -->
+        <mxCell id="e_embed_es" value="向量索引" style="html=1;rounded=1;strokeColor=#9C27B0;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s_embed" target="d_es" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- DeepSeek → Redis (completion save) -->
+        <mxCell id="e_ds_redis" value="保存历史" style="html=1;rounded=1;strokeColor=#9C27B0;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s_deepseek" target="d_redis" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Kafka → MySQL -->
+        <mxCell id="e_kafka_mysql" value="分块元数据" style="html=1;rounded=1;strokeColor=#9C27B0;strokeWidth=1;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.7;entryY=0;entryDx=0;entryDy=0;" edge="1" source="s_kafka" target="d_mysql" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

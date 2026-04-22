@@ -1,0 +1,9 @@
+{
+  "minimax": {
+    "type": "http",
+    "url": "https://api.minimaxi.com/mcp/",
+    "headers": {
+      "Authorization": "Bearer sk-cp-ORonDZ4PrssE1ktk_HjpUtdeauYqSw0mBMfJZdfTkWCsEgOrEei39xK5_M56sHkIwvrAaP9GVTQeUAsZisOrZWHouu4OyzFfa285D4sapMT38WxeY_CuVT0"
+    }
+  }
+}

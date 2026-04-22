@@ -32,6 +32,22 @@ mvn spring-boot:run
 cd frontend && pnpm install && pnpm dev
 ```
 
+## Tech Stack Summary
+
+### Backend
+- **Framework**: Spring Boot 3.4.2 (Java 17) with WebFlux for reactive API calls
+- **ORM**: Spring Data JPA with MySQL
+- **Document Parsing**: Apache Tika
+- **Security**: Spring Security + JWT
+- **Real-time**: WebSocket
+
+### Frontend
+- **Framework**: Vue 3 + TypeScript + Vite
+- **UI Library**: Naive UI
+- **Styling**: UnoCSS + SCSS
+- **State**: Pinia
+- **Icons**: Iconify
+
 ## Common Development Commands
 
 ### Backend (Spring Boot)
@@ -94,28 +110,47 @@ src/main/java/com/yizhaoqi/smartpai/
 frontend/src/
 ├── assets/                       # Static assets (SVG, images)
 ├── components/                   # Reusable Vue components
+├── constants/                    # Application constants
+├── enum/                         # TypeScript enums
+├── hooks/                        # Vue composables
 ├── layouts/                      # Page layouts
+├── locales/                      # i18n language files
+├── plugins/                      # Vue plugins
 ├── router/                       # Vue Router configuration
 ├── service/                      # API integration
+│   ├── api/                      # API endpoint definitions (auth, org-tag, route)
+│   └── request/                  # Axios request/response handling
 ├── store/                        # Pinia state management
-├── views/                        # Page components
-└── utils/                        # Utility functions
+├── styles/                       # Global styles
+├── theme/                        # Theme configuration
+├── typings/                      # TypeScript type definitions
+├── utils/                        # Utility functions
+└── views/                        # Page components
 ```
 
 ## Key Components
 
 ### Core Services
-- **DocumentService**: Handles document upload, parsing, and management
-- **ElasticsearchService**: Manages document indexing and search
-- **VectorizationService**: Converts text to embeddings using AI models
-- **ChatHandler**: Processes AI chat interactions with RAG
+- **DocumentService**: Handles document upload, parsing, chunking, and management
+- **ElasticsearchService**: Manages document indexing and semantic search
+- **VectorizationService**: Converts text chunks to embeddings via Doubao API
+- **ChatHandler/WebSocketHandler**: Processes AI chat with RAG, handles WebSocket real-time communication
 - **UserService**: User authentication and management
 - **ConversationService**: Chat history and session management
 
+### File Processing Pipeline
+1. Client uploads file to backend via multipart upload
+2. File stored in MinIO with MD5-based deduplication
+3. Kafka message published for async processing
+4. Consumer parses document via Apache Tika, chunks text
+5. Chunks vectorized via Doubao Embedding API
+6. Vectors stored in Elasticsearch for search
+
 ### AI Integration
-- **DeepSeek API**: Primary LLM for chat responses
-- **Embedding API**: Text-embedding-v4 for document vectorization
-- **RAG Pipeline**: Document → Chunk → Embedding → Search → Response
+- **DeepSeek API**: Primary LLM for chat responses (via WebFlux WebClient)
+- **Doubao Embedding**: Text embedding via ByteDance's embedding service for document vectorization
+- **RAG Pipeline**: Document → Apache Tika parsing → Chunk → Doubao Embedding → Elasticsearch → Search → DeepSeek Response
+- **Kafka Consumer**: Async file processing pipeline for large document handling
 
 ### Multi-tenant Architecture
 - **Organization Tags**: Supports multi-tenant isolation
@@ -125,12 +160,13 @@ frontend/src/
 ## Configuration Files
 
 ### Backend Configuration
-- `application.yml`: Main configuration with database, Redis, Kafka, AI services
+- `application.yml`: Main configuration (port 8080, database, Redis, Kafka, AI services)
 - `application-dev.yml`: Development-specific settings
 - `application-docker.yml`: Docker deployment settings
 
 ### Frontend Configuration
-- `vite.config.ts`: Vite build configuration
+- `.env`: API base URL (`VITE_API_BASE_URL` defaults to `/api`)
+- `vite.config.ts`: Vite build configuration with dev server proxy
 - `tsconfig.json`: TypeScript configuration
 - `pnpm-workspace.yaml`: Workspace configuration for monorepo
 
@@ -153,8 +189,9 @@ The application uses MySQL as the primary database with JPA/Hibernate for ORM. K
 - **MySQL 8.0**: Primary database
 
 ### AI Services
-- **DeepSeek API**: LLM for generating responses
-- **DashScope Embedding**: Text-embedding-v4 for document vectorization
+- **DeepSeek API**: LLM for generating responses (WebFlux reactive client)
+- **Doubao Embedding**: Text embedding via ByteDance for document vectorization
+- **Apache Tika**: Document parsing (PDF, Word, Excel, etc.)
 
 ## Development Workflow
 

@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-16T00:00:00.000Z" agent="Claude" version="24.0.0">
+  <diagram id="system-architecture" name="PaiSmart RAG系统整体架构图">
+    <mxGraphModel dx="1900" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1900" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ============================================================ -->
+        <!--                    LAYER 1: 接入层                             -->
+        <!-- ============================================================ -->
+        <mxCell id="layer1" value="&lt;b&gt;接入层 (Presentation Layer)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#BDBDBD;fontColor=#333;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=15;spacingTop=5;container=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="1860" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fe_group" value="&lt;b&gt;Vue 3 Web 应用&lt;/b&gt; (SoybeanJS Admin + Naive UI + Pinia + TypeScript)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#81C784;fontColor=#1B5E20;fontSize=11;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer1">
+          <mxGeometry x="20" y="28" width="1820" height="82" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fe_chat" value="&lt;b&gt;💬 智能对话&lt;/b&gt;&lt;br&gt;WebSocket实时通信&lt;br&gt;流式响应 / Markdown渲染 / 停止生成" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontColor=#1B5E20;fontSize=10;" vertex="1" parent="fe_group">
+          <mxGeometry x="15" y="22" width="410" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fe_kb" value="&lt;b&gt;📚 知识库管理&lt;/b&gt;&lt;br&gt;分片上传(5MB/片) / MD5去重&lt;br&gt;文件预览 / 下载 / 删除" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontColor=#1B5E20;fontSize=10;" vertex="1" parent="fe_group">
+          <mxGeometry x="460" y="22" width="410" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fe_user" value="&lt;b&gt;👤 用户管理&lt;/b&gt;&lt;br&gt;注册 / 登录 / JWT令牌管理&lt;br&gt;个人信息 / 组织标签查看" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontColor=#1B5E20;fontSize=10;" vertex="1" parent="fe_group">
+          <mxGeometry x="905" y="22" width="410" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="fe_admin" value="&lt;b&gt;⚙️ 系统管理&lt;/b&gt;&lt;br&gt;用户CRUD / 组织架构树管理&lt;br&gt;会话审计 / 系统监控" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;fontColor=#1B5E20;fontSize=10;" vertex="1" parent="fe_group">
+          <mxGeometry x="1350" y="22" width="410" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                   LAYER 2: 安全网关层                          -->
+        <!-- ============================================================ -->
+        <mxCell id="layer2" value="&lt;b&gt;安全网关层 (Security Gateway) — Spring Security Filter Chain&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFB74D;fontColor=#E65100;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=15;spacingTop=5;container=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="150" width="1860" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="cors" value="&lt;b&gt;CORS 配置&lt;/b&gt;&lt;br&gt;跨域资源共享" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;fontColor=#E65100;fontSize=11;" vertex="1" parent="layer2">
+          <mxGeometry x="50" y="40" width="340" height="45" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="jwt_f" value="&lt;b&gt;JWT 认证过滤器&lt;/b&gt;&lt;br&gt;JwtAuthenticationFilter&lt;br&gt;Token验证 / 自动刷新 / 5min宽限期" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;fontColor=#E65100;fontSize=10;" vertex="1" parent="layer2">
+          <mxGeometry x="440" y="35" width="340" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="orgtag_f" value="&lt;b&gt;组织权限过滤器&lt;/b&gt;&lt;br&gt;OrgTagAuthorizationFilter&lt;br&gt;私人/组织/公开 三级资源权限" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;fontColor=#E65100;fontSize=10;" vertex="1" parent="layer2">
+          <mxGeometry x="830" y="35" width="340" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ws_cfg" value="&lt;b&gt;WebSocket 配置&lt;/b&gt;&lt;br&gt;/chat/{token} 端点注册" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#FF9800;fontColor=#E65100;fontSize=11;" vertex="1" parent="layer2">
+          <mxGeometry x="1220" y="40" width="340" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- L2 internal arrows -->
+        <mxCell id="e_cors_jwt" value="" style="html=1;rounded=1;strokeColor=#FF9800;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="cors" target="jwt_f" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e_jwt_org" value="" style="html=1;rounded=1;strokeColor=#FF9800;endArrow=block;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="jwt_f" target="orgtag_f" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                   LAYER 3: API控制器层                         -->
+        <!-- ============================================================ -->
+        <mxCell id="layer3" value="&lt;b&gt;API 控制器层 (Controllers) — /api/v1/&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#90CAF9;fontColor=#0D47A1;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=15;spacingTop=5;container=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="270" width="1860" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Row 1 -->
+        <mxCell id="c_auth" value="AuthController&lt;br&gt;/auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="50" y="35" width="290" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_user" value="UserController&lt;br&gt;/users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="380" y="35" width="290" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_upload" value="UploadController&lt;br&gt;/upload (分片/合并/状态)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="710" y="35" width="290" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_doc" value="DocumentController&lt;br&gt;/documents (CRUD/下载/预览)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="1040" y="35" width="290" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_search" value="SearchController&lt;br&gt;/search/hybrid (混合检索)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="1370" y="35" width="290" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- Row 2 -->
+        <mxCell id="c_chat" value="ChatController&lt;br&gt;WebSocket /chat/{token}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90CAF9;strokeColor=#1565C0;fontColor=#0D47A1;fontSize=9;fontStyle=1;" vertex="1" parent="layer3">
+          <mxGeometry x="50" y="75" width="290" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_conv" value="ConversationController&lt;br&gt;/users/conversation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="380" y="75" width="290" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_admin" value="AdminController&lt;br&gt;/admin (用户/组织/审计)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="710" y="75" width="290" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="c_parse" value="ParseController&lt;br&gt;/parse (同步文档解析)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;fontColor=#0D47A1;fontSize=9;" vertex="1" parent="layer3">
+          <mxGeometry x="1040" y="75" width="290" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                   LAYER 4: 业务服务层                          -->
+        <!-- ============================================================ -->
+        <mxCell id="layer4" value="&lt;b&gt;业务服务层 (Business Services)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#B39DDB;fontColor=#4A148C;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=15;spacingTop=5;container=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="390" width="1860" height="215" as="geometry"/>
+        </mxCell>
+
+        <!-- RAG 对话服务 -->
+        <mxCell id="rag_group" value="&lt;b&gt;RAG 对话服务&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#7986CB;fontColor=#283593;fontSize=12;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer4">
+          <mxGeometry x="20" y="28" width="560" height="177" as="geometry"/>
+        </mxCell>
+        <mxCell id="chat_handler" value="&lt;b&gt;ChatHandler&lt;/b&gt;&lt;br&gt;RAG流程编排&lt;br&gt;WebSocket会话管理&lt;br&gt;上下文构建 / 历史管理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=10;" vertex="1" parent="rag_group">
+          <mxGeometry x="15" y="35" width="255" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="hybrid_search" value="&lt;b&gt;HybridSearchService&lt;/b&gt;&lt;br&gt;KNN向量 + BM25文本&lt;br&gt;Rescore重排序&lt;br&gt;权限过滤 + 文件名关联" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=10;" vertex="1" parent="rag_group">
+          <mxGeometry x="290" y="35" width="255" height="65" as="geometry"/>
+        </mxCell>
+        <!-- RAG internal arrow -->
+        <mxCell id="e_handler_hybrid" value="检索" style="html=1;rounded=1;strokeColor=#3F51B5;endArrow=block;endFill=1;fontSize=9;fontColor=#3F51B5;fontStyle=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="chat_handler" target="hybrid_search" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- 文档处理服务 -->
+        <mxCell id="doc_group" value="&lt;b&gt;文档处理服务&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#7986CB;fontColor=#283593;fontSize=12;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer4">
+          <mxGeometry x="600" y="28" width="560" height="177" as="geometry"/>
+        </mxCell>
+        <mxCell id="parse_svc" value="&lt;b&gt;ParseService&lt;/b&gt;&lt;br&gt;Apache Tika 文档解析&lt;br&gt;HanLP 中文分词&lt;br&gt;父子分块策略 (512字/块)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=10;" vertex="1" parent="doc_group">
+          <mxGeometry x="15" y="35" width="255" height="65" as="geometry"/>
+        </mxCell>
+        <mxCell id="vec_svc" value="&lt;b&gt;VectorizationService&lt;/b&gt;&lt;br&gt;批量向量化 (batch=10)&lt;br&gt;ES文档构建&lt;br&gt;权限信息注入" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=10;" vertex="1" parent="doc_group">
+          <mxGeometry x="290" y="35" width="255" height="65" as="geometry"/>
+        </mxCell>
+
+        <!-- 管理与基础服务 -->
+        <mxCell id="mgmt_group" value="&lt;b&gt;管理与基础服务&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#7986CB;fontColor=#283593;fontSize=12;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer4">
+          <mxGeometry x="1180" y="28" width="620" height="177" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="upload_svc" value="UploadService&lt;br&gt;分片上传/合并" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=9;" vertex="1" parent="mgmt_group">
+          <mxGeometry x="15" y="35" width="185" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="doc_svc" value="DocumentService&lt;br&gt;文档生命周期" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=9;" vertex="1" parent="mgmt_group">
+          <mxGeometry x="210" y="35" width="185" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_svc" value="UserService&lt;br&gt;用户CRUD/组织管理" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=9;" vertex="1" parent="mgmt_group">
+          <mxGeometry x="405" y="35" width="185" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="conv_svc" value="ConversationService&lt;br&gt;会话历史持久化" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=9;" vertex="1" parent="mgmt_group">
+          <mxGeometry x="15" y="73" width="185" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="org_cache" value="OrgTagCacheService&lt;br&gt;组织标签缓存(24h)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=9;" vertex="1" parent="mgmt_group">
+          <mxGeometry x="210" y="73" width="185" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="token_cache" value="TokenCacheService&lt;br&gt;JWT令牌/黑名单" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=9;" vertex="1" parent="mgmt_group">
+          <mxGeometry x="405" y="73" width="185" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="file_val" value="FileTypeValidationService — 文件类型校验 (PDF/DOC/XLS/PPT/TXT/MD/ODT/HTML/CSV/EPUB等)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C5CAE9;strokeColor=#3F51B5;fontColor=#1A237E;fontSize=9;" vertex="1" parent="mgmt_group">
+          <mxGeometry x="15" y="111" width="575" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                   LAYER 5: 外部AI服务层                        -->
+        <!-- ============================================================ -->
+        <mxCell id="layer5" value="&lt;b&gt;外部 AI 服务层 (External AI Services)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#FFD54F;fontColor=#F57F17;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=15;spacingTop=5;container=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="625" width="1860" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="deepseek_api" value="&lt;b&gt;🤖 DeepSeek API&lt;/b&gt;&lt;br&gt;模型: deepseek-chat&lt;br&gt;SSE流式响应 | temp=0.3 | max_tokens=2000 | top_p=0.9" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FFC107;fontColor=#F57F17;fontSize=11;shadow=1;" vertex="1" parent="layer5">
+          <mxGeometry x="100" y="35" width="500" height="52" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="dashscope_api" value="&lt;b&gt;🧠 DashScope Embedding API (阿里云)&lt;/b&gt;&lt;br&gt;模型: text-embedding-v4 | 2048维向量 | 批量大小=10 | 3次重试" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#FFC107;fontColor=#F57F17;fontSize=11;shadow=1;" vertex="1" parent="layer5">
+          <mxGeometry x="680" y="35" width="500" height="52" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                   LAYER 6: 消息中间件层                        -->
+        <!-- ============================================================ -->
+        <mxCell id="layer6" value="&lt;b&gt;消息中间件层 (Message Queue) — 异步文档处理管道&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F7FA;strokeColor=#80DEEA;fontColor=#006064;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=15;spacingTop=5;container=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="745" width="1860" height="90" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="kafka" value="&lt;b&gt;Apache Kafka&lt;/b&gt;&lt;br&gt;Topic: file-processing-topic1&lt;br&gt;事务性消息 | 幂等生产者 | acks=all" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2EBF2;strokeColor=#00BCD4;fontColor=#006064;fontSize=11;" vertex="1" parent="layer6">
+          <mxGeometry x="120" y="32" width="400" height="45" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="file_consumer" value="&lt;b&gt;FileProcessingConsumer&lt;/b&gt;&lt;br&gt;异步文档处理 | 3s重试间隔 | 最多4次 | 死信队列(DLT)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2EBF2;strokeColor=#00BCD4;fontColor=#006064;fontSize=11;" vertex="1" parent="layer6">
+          <mxGeometry x="580" y="32" width="420" height="45" as="geometry"/>
+        </mxCell>
+
+        <!-- Kafka → Consumer internal arrow -->
+        <mxCell id="e_kafka_consumer" value="消费消息" style="html=1;rounded=1;strokeColor=#00BCD4;endArrow=block;endFill=1;fontSize=9;fontColor=#006064;fontStyle=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="kafka" target="file_consumer" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--                   LAYER 7: 基础设施与数据层                     -->
+        <!-- ============================================================ -->
+        <mxCell id="layer7" value="&lt;b&gt;基础设施与数据层 (Infrastructure)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#CE93D8;fontColor=#4A148C;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=15;spacingTop=5;container=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="855" width="1860" height="240" as="geometry"/>
+        </mxCell>
+
+        <!-- MySQL -->
+        <mxCell id="mysql_group" value="&lt;b&gt;MySQL 8.0&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#9C27B0;fontColor=#4A148C;fontSize=12;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer7">
+          <mxGeometry x="25" y="28" width="430" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="mysql_detail" value="&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;&lt;b&gt;user&lt;/b&gt; — 用户账号 / BCrypt密码 / 角色 / 组织标签&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;&lt;b&gt;file_upload&lt;/b&gt; — 文件元数据 / MD5 / 状态 / 权限&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;&lt;b&gt;document_vector&lt;/b&gt; — 文档分块内容 / chunkId&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;&lt;b&gt;conversation&lt;/b&gt; — 对话问题与回答记录&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;&lt;b&gt;organization_tag&lt;/b&gt; — 组织标签层级 (tagId/parentTag)&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;&lt;b&gt;chunk_info&lt;/b&gt; — 分块索引 / 存储路径&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#CE93D8;fontColor=#4A148C;fontSize=10;verticalAlign=top;align=left;spacingLeft=8;spacingTop=5;" vertex="1" parent="mysql_group">
+          <mxGeometry x="10" y="30" width="410" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- Redis -->
+        <mxCell id="redis_group" value="&lt;b&gt;Redis 7.0&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#9C27B0;fontColor=#4A148C;fontSize=12;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer7">
+          <mxGeometry x="475" y="28" width="430" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="redis_detail" value="&lt;div style=&quot;text-align:left;padding:6px;&quot;&gt;&lt;b&gt;Token 缓存&lt;/b&gt;&lt;br&gt;有效令牌 / 黑名单 / 用户活跃令牌集&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:6px;&quot;&gt;&lt;b&gt;会话历史&lt;/b&gt;&lt;br&gt;7天 TTL / 最近20条消息 / 按日期过滤&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:6px;&quot;&gt;&lt;b&gt;上传进度&lt;/b&gt;&lt;br&gt;Bitmap 位图追踪已上传分片&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:6px;&quot;&gt;&lt;b&gt;组织标签缓存&lt;/b&gt;&lt;br&gt;有效标签层级(含祖先) / 24h TTL&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#CE93D8;fontColor=#4A148C;fontSize=10;verticalAlign=top;align=left;spacingLeft=8;spacingTop=5;" vertex="1" parent="redis_group">
+          <mxGeometry x="10" y="30" width="410" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- MinIO -->
+        <mxCell id="minio_group" value="&lt;b&gt;MinIO 对象存储&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#9C27B0;fontColor=#4A148C;fontSize=12;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer7">
+          <mxGeometry x="925" y="28" width="430" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="minio_detail" value="&lt;div style=&quot;text-align:left;padding:8px;&quot;&gt;&lt;b&gt;chunks/ 存储路径&lt;/b&gt;&lt;br&gt;分片文件临时存储&lt;br&gt;路径: chunks/{fileMd5}/{index}&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:8px;&quot;&gt;&lt;b&gt;merged/ 存储路径&lt;/b&gt;&lt;br&gt;合并后完整文件&lt;br&gt;路径: merged/{fileName}&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:8px;&quot;&gt;&lt;b&gt;预签名 URL&lt;/b&gt;&lt;br&gt;安全下载 / Consumer拉取文件&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#CE93D8;fontColor=#4A148C;fontSize=10;verticalAlign=top;align=left;spacingLeft=8;spacingTop=5;" vertex="1" parent="minio_group">
+          <mxGeometry x="10" y="30" width="410" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- Elasticsearch -->
+        <mxCell id="es_group" value="&lt;b&gt;Elasticsearch 8.10&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#9C27B0;fontColor=#4A148C;fontSize=12;fontStyle=1;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;container=1;" vertex="1" parent="layer7">
+          <mxGeometry x="1375" y="28" width="430" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="es_detail" value="&lt;div style=&quot;text-align:left;padding:6px;&quot;&gt;&lt;b&gt;knowledge_base 索引&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;• fileMd5 (keyword) — 文件标识&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;• chunkId (integer) — 分块编号&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;• textContent (text) — ik_max_word/ik_smart&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;• vector (dense_vector) — 2048维 cosine&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;• userId / orgTag (keyword) — 权限字段&lt;/div&gt;&lt;div style=&quot;text-align:left;padding:4px;&quot;&gt;• isPublic (boolean) — 公开标识&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#CE93D8;fontColor=#4A148C;fontSize=10;verticalAlign=top;align=left;spacingLeft=8;spacingTop=5;" vertex="1" parent="es_group">
+          <mxGeometry x="10" y="30" width="410" height="160" as="geometry"/>
+        </mxCell>
+
+        <!-- ============================================================ -->
+        <!--              INTER-LAYER CONNECTION ARROWS                    -->
+        <!-- ============================================================ -->
+
+        <!-- L1 → L2: Frontend to Security -->
+        <mxCell id="e_fe_sec" value="HTTPS / WSS" style="html=1;rounded=1;strokeColor=#666;endArrow=block;endFill=1;fontSize=10;fontColor=#333;fontStyle=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="fe_group" target="layer2" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- L2 → L3: Security to Controllers -->
+        <mxCell id="e_sec_ctrl" value="认证通过" style="html=1;rounded=1;strokeColor=#666;endArrow=block;endFill=1;fontSize=10;fontColor=#333;fontStyle=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" edge="1" source="orgtag_f" target="layer3" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- WS Config → Chat Controller -->
+        <mxCell id="e_ws_chat" value="" style="html=1;rounded=1;strokeColor=#FF9800;endArrow=block;endFill=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="ws_cfg" target="c_chat" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- L3 → L4: Controllers to Services -->
+        <!-- Chat Controller → ChatHandler -->
+        <mxCell id="e_ctrl_chat_handler" value="" style="html=1;rounded=1;strokeColor=#2196F3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="c_chat" target="chat_handler" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Search Controller → HybridSearch -->
+        <mxCell id="e_ctrl_hybrid" value="" style="html=1;rounded=1;strokeColor=#2196F3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" source="c_search" target="hybrid_search" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Upload Controller → UploadService -->
+        <mxCell id="e_ctrl_upload" value="" style="html=1;rounded=1;strokeColor=#2196F3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;" edge="1" source="c_upload" target="upload_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Document Controller → DocumentService -->
+        <mxCell id="e_ctrl_doc" value="" style="html=1;rounded=1;strokeColor=#2196F3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="c_doc" target="doc_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Parse Controller → ParseService -->
+        <mxCell id="e_ctrl_parse" value="" style="html=1;rounded=1;strokeColor=#2196F3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="c_parse" target="parse_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Admin Controller → UserService -->
+        <mxCell id="e_ctrl_admin" value="" style="html=1;rounded=1;strokeColor=#2196F3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;" edge="1" source="c_admin" target="user_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Auth Controller → TokenCache -->
+        <mxCell id="e_ctrl_auth" value="" style="html=1;rounded=1;strokeColor=#2196F3;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;" edge="1" source="c_auth" target="token_cache" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- L4 → L5: Services to External AI -->
+        <!-- ChatHandler → DeepSeek (LLM流式生成) -->
+        <mxCell id="e_handler_deepseek" value="流式生成 (SSE)" style="html=1;rounded=1;strokeColor=#FFC107;endArrow=block;endFill=1;fontSize=10;fontColor=#F57F17;fontStyle=1;strokeWidth=2;exitX=0.3;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" source="chat_handler" target="deepseek_api" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- HybridSearch → DashScope (查询向量化) -->
+        <mxCell id="e_hybrid_dash" value="查询向量化" style="html=1;rounded=1;strokeColor=#FFC107;endArrow=block;endFill=1;fontSize=10;fontColor=#F57F17;fontStyle=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="hybrid_search" target="dashscope_api" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Vectorization → DashScope (批量向量化) -->
+        <mxCell id="e_vec_dash" value="批量Embedding" style="html=1;rounded=1;strokeColor=#FFC107;endArrow=block;endFill=1;fontSize=10;fontColor=#F57F17;fontStyle=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.7;entryY=0;entryDx=0;entryDy=0;" edge="1" source="vec_svc" target="dashscope_api" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- L4 → L6: UploadService → Kafka -->
+        <mxCell id="e_upload_kafka" value="FileProcessingTask&lt;br&gt;(事务性消息)" style="html=1;rounded=1;strokeColor=#00BCD4;endArrow=block;endFill=1;fontSize=9;fontColor=#006064;fontStyle=1;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" source="upload_svc" target="kafka" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- L6 → L4: Consumer → ParseService (back up) -->
+        <mxCell id="e_consumer_parse" value="Tika解析+HanLP分词" style="html=1;rounded=1;strokeColor=#00BCD4;endArrow=block;endFill=1;fontSize=9;fontColor=#006064;fontStyle=1;exitX=0.3;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" edge="1" source="file_consumer" target="parse_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- L6 → L4: Consumer → Vectorization (back up) -->
+        <mxCell id="e_consumer_vec" value="向量化+ES索引" style="html=1;rounded=1;strokeColor=#00BCD4;endArrow=block;endFill=1;fontSize=9;fontColor=#006064;fontStyle=1;exitX=0.7;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;dashed=1;" edge="1" source="file_consumer" target="vec_svc" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- L4 → L7: Services to Infrastructure -->
+        <!-- ChatHandler → Redis (会话历史) -->
+        <mxCell id="e_handler_redis" value="会话历史(7天)" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="chat_handler" target="redis_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ParseService → MySQL (分块存储) -->
+        <mxCell id="e_parse_mysql" value="分块存储" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="parse_svc" target="mysql_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Vectorization → ES (向量索引) -->
+        <mxCell id="e_vec_es" value="bulkIndex" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;exitX=0.8;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="vec_svc" target="es_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- UploadService → MinIO (文件存储) -->
+        <mxCell id="e_upload_minio" value="文件存储" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" source="upload_svc" target="minio_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- HybridSearch → ES (混合检索) -->
+        <mxCell id="e_hybrid_es" value="KNN+BM25检索" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="hybrid_search" target="es_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- UploadService → Redis (进度追踪) -->
+        <mxCell id="e_upload_redis" value="上传进度" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;" edge="1" source="upload_svc" target="redis_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- UploadService → MySQL (元数据) -->
+        <mxCell id="e_upload_mysql" value="文件元数据" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.8;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="upload_svc" target="mysql_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- UserService → MySQL -->
+        <mxCell id="e_user_mysql" value="用户/组织数据" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="user_svc" target="mysql_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Vectorization → MySQL (读取分块) -->
+        <mxCell id="e_vec_mysql" value="读取分块" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;" edge="1" source="vec_svc" target="mysql_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Consumer → MinIO (下载文件) -->
+        <mxCell id="e_consumer_minio" value="下载合并文件" style="html=1;rounded=1;strokeColor=#9C27B0;endArrow=block;endFill=1;fontSize=9;fontColor=#4A148C;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="file_consumer" target="minio_group" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
