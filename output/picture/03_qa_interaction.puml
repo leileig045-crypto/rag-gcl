@@ -1,0 +1,46 @@
+@startuml QA_Interaction
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+
+|#E3F2FD| 用户交互 |
+start
+:用户输入问题;
+:WebSocket连接建立;
+
+|#FFF3E0| 认证授权 |
+:JWT Token验证;
+:提取用户身份;
+:OrgTag权限验证;
+
+|#F3E5F5| 混合检索 |
+:Embedding生成查询向量;
+:KNN向量相似度检索;
+:BM25文本匹配;
+:Rescore重排序;
+:权限过滤(私人/组织/公开);
+:返回Top5结果;
+
+|#E8F5E9| RAG增强生成 |
+:构建上下文[文档1,2,3];
+:构建Prompt(System角色+参考资料);
+:DeepSeek API流式响应;
+:WebSocket推送片段;
+
+|#E3F2FD| 会话管理 |
+:保存对话历史到Redis;
+:返回完成通知;
+stop
+
+note right of WebSocket
+代码位置: ChatWebSocketHandler
+end note
+
+note right of KNN
+代码位置: HybridSearchService.searchWithPermission()
+end note
+
+note right of DeepSeek
+代码位置: DeepSeekClient.streamResponse()
+end note
+
+@enduml

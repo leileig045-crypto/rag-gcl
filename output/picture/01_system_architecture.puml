@@ -1,0 +1,41 @@
+@startuml GuaiSmart_System_Architecture
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+
+rectangle "接入层" <<#E8F4FD>> as AccessLayer {
+  rectangle "Vue 3\nWeb应用" <<#87CEEB>>
+  rectangle "移动端\nH5页面" <<#87CEEB>>
+  rectangle "WebSocket\n即时通信" <<#87CEEB>>
+}
+
+rectangle "处理层" <<#FFF8E7>> as ProcessLayer {
+  rectangle "文档处理服务" <<#FFE4B5>>
+  rectangle "检索服务" <<#FFE4B5>>
+  rectangle "问答服务" <<#FFE4B5>>
+  rectangle "权限控制服务" <<#FFE4B5>>
+  rectangle "文件管理服务" <<#FFE4B5>>
+  rectangle "会话管理" <<#FFE4B5>>
+}
+
+rectangle "服务层" <<#E8F8E8>> as ServiceLayer {
+  rectangle "DeepSeek API" <<#90EE90>>
+  rectangle "Embedding API" <<#90EE90>>
+  rectangle "Kafka 消息队列" <<#90EE90>>
+  rectangle "MinIO 文件存储" <<#90EE90>>
+  rectangle "Redis 缓存" <<#90EE90>>
+  rectangle "MySQL 关系数据库" <<#90EE90>>
+}
+
+rectangle "数据层" <<#F3E5F5>> as DataLayer {
+  rectangle "Elasticsearch\n知识库向量存储" <<#CE93D8>>
+  rectangle "Redis 会话存储" <<#CE93D8>>
+  rectangle "MySQL 元数据存储" <<#CE93D8>>
+}
+
+AccessLayer -down-> ProcessLayer : HTTPS / WSS
+ProcessLayer -down-> ServiceLayer
+ServiceLayer -down-> DataLayer
+
+@enduml

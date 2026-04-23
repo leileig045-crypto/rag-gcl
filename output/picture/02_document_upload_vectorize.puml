@@ -1,0 +1,47 @@
+@startuml Document_Upload_Vectorize
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+
+|#E3F2FD| 用户操作层 |
+start
+:用户上传文档文件;
+:前端格式校验;
+if (格式合格?) then (是)
+  :文件接收分片上传;
+  :MinIO文件存储;
+  :MySQL保存元数据;
+  :Kafka发送消息;
+  :FileProcessing Consumer;
+  :状态更新"处理中";
+  
+  |#F3E5F5| 文档解析与分块层 |
+  :Apache Tika文档解析;
+  :HanLP智能分词;
+  :父子分块策略\n(父块:1MB 子块:500字);
+  :DocumentVector保存到MySQL;
+  
+  |#E8F5E9| 向量化存储层 |
+  :Embedding Client;
+  :text-embedding-v4模型;
+  :EsDocument构建索引文档;
+  :Elasticsearch批量索引;
+  :状态更新"已完成";
+  stop
+else (否)
+  :返回错误提示;
+  stop
+endif
+
+note right of FileProcessing
+代码位置: FileProcessingConsumer
+end note
+
+note right of ApacheTika
+代码位置: ParseService.parseAndSave()
+end note
+
+note right of EmbeddingClient
+代码位置: VectorizationService.vectorize()
+end note
+
+@enduml

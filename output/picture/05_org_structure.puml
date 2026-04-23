@@ -1,0 +1,31 @@
+@startuml Org_Structure
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontSize 10
+
+rectangle "根组织 (ROOT)\ntagId: ROOT" <<#FFE0B2>> as ROOT
+
+rectangle "技术部\nDEPT_TECH" <<#B3E5FC>> as TECH
+rectangle "运营部\nDEPT_OPS" <<#B3E5FC>> as OPS
+rectangle "市场部\nDEPT_MKT" <<#B3E5FC>> as MKT
+
+rectangle "后端组\nTECH_BE" <<#C8E6C9>>
+rectangle "前端组\nTECH_FE" <<#C8E6C9>>
+rectangle "AI组\nTECH_AI" <<#C8E6C9>>
+rectangle "行政组\nOPS_A" <<#C8E6C9>>
+rectangle "策划组\nMKT_PLAN" <<#C8E6C9>>
+
+ROOT --> TECH
+ROOT --> OPS
+ROOT --> MKT
+TECH --> TECH_BE
+TECH --> TECH_FE
+TECH --> TECH_AI
+OPS --> OPS_A
+MKT --> MKT_PLAN
+
+note bottom of ROOT
+组织标签层级结构
+支持多级嵌套
+end note
+
+@enduml
